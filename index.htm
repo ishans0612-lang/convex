@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONVEX — File Utility Studio</title>
+<style>
+:root {
+  --bg:#101010;--panel:#1b1b1b;--text:#fff;
+  --muted:#999;--yellow:#ffd43b;--orange:#ff8c32;
+  --border:#303030;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);
+font-family:Arial,sans-serif;min-height:100vh}
+header{height:70px;padding:0 6%;display:flex;
+align-items:center;justify-content:space-between;
+border-bottom:1px solid var(--border)}
+.logo{font-size:25px;font-weight:900;letter-spacing:2px}
+.logo span{color:var(--yellow)}
+header button,.action{
+background:var(--yellow);color:#111;border:0;
+padding:11px 18px;border-radius:9px;
+font-weight:bold;cursor:pointer}
+.hero{padding:55px 6% 30px}
+.hero small{color:var(--yellow);letter-spacing:3px}
+.hero h1{font-size:clamp(32px,6vw,58px);
+margin:15px 0}
+.hero h1 span{color:var(--yellow)}
+.hero p{color:var(--muted);line-height:1.7}
+.search{margin-top:25px;width:100%;max-width:500px;
+padding:15px;border:1px solid var(--border);
+border-radius:10px;background:var(--panel);
+color:white;font-size:15px}
+main{padding:20px 6% 70px}
+.section-title{margin:25px 0 18px;font-size:22px}
+.tools{display:grid;grid-template-columns:
+repeat(auto-fit,minmax(210px,1fr));gap:17px}
+.tool{background:var(--panel);border:1px solid var(--border);
+padding:22px;border-radius:15px;cursor:pointer;
+transition:.2s}
+.tool:hover{border-color:var(--yellow);transform:translateY(-3px)}
+.tool .symbol{font-size:27px;margin-bottom:18px;color:var(--yellow)}
+.tool h3{margin-bottom:9px}
+.tool p{font-size:13px;color:var(--muted);line-height:1.5}
+.workspace{display:none;background:var(--panel);
+border:1px solid var(--border);padding:25px;
+border-radius:15px;margin:25px 0}
+.workspace h2{margin-bottom:20px}
+.workspace input,.workspace textarea,.workspace select{
+width:100%;padding:13px;margin:9px 0 15px;
+background:#111;color:white;border:1px solid var(--border);
+border-radius:8px;font-size:15px}
+.workspace textarea{min-height:130px;resize:vertical}
+.workspace label{font-size:13px;color:var(--muted)}
+.output{padding:14px;background:#111;border-radius:8px;
+margin:12px 0;overflow-wrap:anywhere}
+.close{float:right;background:none;color:white;
+border:1px solid var(--border);padding:7px 12px;
+border-radius:7px;cursor:pointer}
+footer{text-align:center;padding:25px;color:var(--muted);
+border-top:1px solid var(--border);font-size:13px}
+@media(max-width:600px){
+ header{padding:0 5%}.hero{padding:40px 5% 20px}
+ main{padding:15px 5% 50px}
+ .workspace{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CON<span>VEX</span></div>
+  <button onclick="showAll()">All Tools</button>
+</header>
+
+<section class="hero">
+  <small>YOUR DIGITAL TOOLBOX</small>
+  <h1>One Studio.<br><span>Endless Possibilities.</span></h1>
+  <p>Simple, powerful tools for your everyday digital work.</p>
+  <input class="search" id="search" placeholder="Search tools..." oninput="searchTools()">
+</section>
+
+<main>
+  <h2 class="section-title">Explore Tools</h2>
+  <div class="tools" id="tools">
+
+    <div class="tool" data-name="image compressor" onclick="openTool('image')">
+      <div class="symbol">▧</div><h3>Image Compressor</h3>
+      <p>Compress images and download smaller files.</p>
+    </div>
+
+    <div class="tool" data-name="text counter" onclick="openTool('counter')">
+      <div class="symbol">T</div><h3>Text Counter</h3>
+      <p>Count words, characters and sentences.</p>
+    </div>
+
+    <div class="tool" data-name="case converter" onclick="openTool('case')">
+      <div class="symbol">Aa</div><h3>Case Converter</h3>
+      <p>Convert text into different letter cases.</p>
+    </div>
+
+    <div class="tool" data-name="password generator" onclick="openTool('password')">
+      <div class="symbol">✳</div><h3>Password Generator</h3>
+      <p>Generate a random strong password.</p>
+    </div>
+
+    <div class="tool" data-name="color picker" onclick="openTool('color')">
+      <div class="symbol">◉</div><h3>Color Studio</h3>
+      <p>Choose colors and copy HEX codes.</p>
+    </div>
+
+    <div class="tool" data-name="unit converter" onclick="openTool('unit')">
+      <div class="symbol">⇄</div><h3>Unit Converter</h3>
+      <p>Convert length, weight and temperature.</p>
+    </div>
+
+  </div>
+
+  <section class="workspace" id="workspace">
+    <button class="close" onclick="closeTool()">Close</button>
+    <h2 id="toolTitle">Tool</h2>
+    <div id="toolContent"></div>
+  </section>
+</main>
+
+<footer>CONVEX © 2026 — Your Digital Utility Studio</footer>
+
+<script>
+const workspace=document.getElementById("workspace");
+const content=document.getElementById("toolContent");
+const title=document.getElementById("toolTitle");
+
+function openTool(type){
+ workspace.style.display="block";
+ workspace.scrollIntoView({behavior:"smooth"});
+ content.innerHTML="";
+
+ const tools={
+ image:{
+  name:"Image Compressor",
+  html:`<label>Select an image</label>
+  <input type="file" id="imageFile" accept="image/*">
+  <label>Image quality</label>
+  <input type="range" id="quality" min="10" max="100" value="75">
+  <p id="qualityValue">75%</p>
+  <button class="action" onclick="compressImage()">Compress Image</button>
+  <div id="imageResult" class="output"></div>`
+ },
+ counter:{
+  name:"Text Counter",
+  html:`<textarea id="textInput" placeholder="Write or paste your text..." oninput="countText()"></textarea>
+  <div class="output" id="countResult">Words: 0 | Characters: 0 | Sentences: 0</div>`
+ },
+ case:{
+  name:"Case Converter",
+  html:`<textarea id="caseInput" placeholder="Enter your text..."></textarea>
+  <button class="action" onclick="convertCase('upper')">UPPERCASE</button>
+  <button class="action" onclick="convertCase('lower')">lowercase</button>
+  <button class="action" onclick="convertCase('title')">Title Case</button>
+  <div class="output" id="caseResult"></div>
+  <button class="action" onclick="copyText('caseResult')">Copy Text</button>`
+ },
+ password:{
+  name:"Password Generator",
+  html:`<label>Password length</label>
+  <input type="number" id="passLength" value="16" min="8" max="64">
+  <button class="action" onclick="generatePassword()">Generate Password</button>
+  <div class="output" id="passResult">Your password will appear here.</div>
+  <button class="action" onclick="copyText('passResult')">Copy</button>`
+ },
+ color:{
+  name:"Color Studio",
+  html:`<label>Choose a color</label>
+  <input type="color" id="colorInput" value="#ffd43b" oninput="updateColor()">
+  <div class="output" id="colorResult">#FFD43B</div>
+  <button class="action" onclick="copyText('colorResult')">Copy HEX</button>`
+ },
+ unit:{
+  name:"Unit Converter",
+  html:`<label>Conversion type</label>
+  <select id="unitType" onchange="convertUnit()">
+   <option value="km">Kilometers to Miles</option>
+   <option value="kg">Kilograms to Pounds</option>
+   <option value="c">Celsius to Fahrenheit</option>
+  </select>
+  <label>Enter value</label>
+  <input type="number" id="unitValue" value="1" oninput="convertUnit()">
+  <div class="output" id="unitResult">Result: 0</div>`
+ }
+ };
+
+ const selected=tools[type];
+ title.textContent=selected.name;
+ content.innerHTML=selected.html;
+
+ if(type==="image"){
+  document.getElementById("quality").oninput=e=>{
+   document.getElementById("qualityValue").textContent=e.target.value+"%";
+  };
+ }
+ if(type==="unit")convertUnit();
+}
+
+function closeTool(){workspace.style.display="none"}
+function showAll(){
+ closeTool();
+ document.getElementById("search").value="";
+ searchTools();
+}
+function searchTools(){
+ const q=document.getElementById("search").value.toLowerCase();
+ document.querySelectorAll(".tool").forEach(t=>{
+  t.style.display=t.dataset.name.includes(q)?"block":"none";
+ });
+}
+function countText(){
+ const text=document.getElementById("textInput").value;
+ const words=text.trim()?text.trim().split(/\s+/).length:0;
+ const chars=text.length;
+ const sentences=text.trim()?text.split(/[.!?]+/).filter(s=>s.trim()).length:0;
+ document.getElementById("countResult").textContent=
+ `Words: ${words} | Characters: ${chars} | Sentences: ${sentences}`;
+}
+function convertCase(type){
+ let text=document.getElementById("caseInput").value;
+ if(type==="upper")text=text.toUpperCase();
+ if(type==="lower")text=text.toLowerCase();
+ if(type==="title")text=text.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+ document.getElementById("caseResult").textContent=text;
+}
+function generatePassword(){
+ const chars="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*";
+ const length=Math.max(8,Math.min(64,Number(document.getElementById("passLength").value)||16));
+ let password="";
+ const random=new Uint32Array(length);
+ crypto.getRandomValues(random);
+ for(let i=0;i<length;i++)password+=chars[random[i]%chars.length];
+ document.getElementById("passResult").textContent=password;
+}
+function updateColor(){
+ document.getElementById("colorResult").textContent=
+ document.getElementById("colorInput").value.toUpperCase();
+}
+function convertUnit(){
+ const value=Number(document.getElementById("unitValue").value)||0;
+ const type=document.getElementById("unitType").value;
+ let result;
+ if(type==="km")result=value*0.621371;
+ if(type==="kg")result=value*2.20462;
+ if(type==="c")result=(value*9/5)+32;
+ document.getElementById("unitResult").textContent=
+ "Result: "+result.toFixed(2);
+}
+function copyText(id){
+ const text=document.getElementById(id).textContent;
+ navigator.clipboard.writeText(text).then(()=>{
+  alert("Copied!");
+ }).catch(()=>alert("Copy not supported in this browser."));
+}
+async function compressImage(){
+ const file=document.getElementById("imageFile").files[0];
+ const result=document.getElementById("imageResult");
+ if(!file){result.textContent="Please select an image first.";return}
+ if(!file.type.startsWith("image/")){result.textContent="Invalid image file.";return}
+ result.textContent="Processing...";
+ const quality=Number(document.getElementById("quality").value)/100;
+ const img=new Image();
+ const url=URL.createObjectURL(file);
+ img.onload=()=>{
+  const canvas=document.createElement("canvas");
+  canvas.width=img.naturalWidth;
+  canvas.height=img.naturalHeight;
+  canvas.getContext("2d").drawImage(img,0,0);
+  canvas.toBlob(blob=>{
+   URL.revokeObjectURL(url);
+   if(!blob){result.textContent="Could not process this image.";return}
+   const downloadURL=URL.createObjectURL(blob);
+   result.innerHTML=`Original: ${(file.size/1024).toFixed(1)} KB<br>
+   Compressed: ${(blob.size/1024).toFixed(1)} KB<br><br>
+   <a href="${downloadURL}" download="convex-image.jpg" style="color:#ffd43b">Download Compressed Image</a>`;
+  },"image/jpeg",quality);
+ };
+ img.onerror=()=>{URL.revokeObjectURL(url);result.textContent="Image could not be loaded."};
+ img.src=url;
+}
+</script>
+</body>
+</html>
